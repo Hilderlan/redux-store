@@ -1,8 +1,12 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import Routes from './routes';
 import './App.css';
 
 const App = () => (
-  <h1>Redux Store</h1>
+  <BrowserRouter>
+    <Routes />
+  </BrowserRouter>
 )
 
 export default App;
