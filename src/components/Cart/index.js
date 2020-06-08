@@ -1,67 +1,101 @@
 import React from 'react';
-import { FiMinusCircle, FiPlusCircle, FiXCircle } from 'react-icons/fi';
+import { useDispatch, useSelector } from 'react-redux';
+ 
+import { FiPlusCircle, FiMinusCircle, FiXCircle } from 'react-icons/fi'
+ 
+import * as CartActions from '../../store/actions/cart';
 import './styles.css';
-
-const Cart = () => {
-  return(
-    <main className="container">
-      <div className="bag-container">
-        <table className="book-table">
-          <thead>
-            <tr>
-              <th />
-              <th>Livro</th>
-              <th>Quantidade</th>
-              <th>Subtotal</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-              <tr>
-                <td>
-                  <img src="https://images-na.ssl-images-amazon.com/images/I/51w53T12s8L.jpg" alt="JavaScript: O Guia Definitivo" />
-                </td>
-                <td>
-                  <strong>JavaScript: O Guia Definitivo</strong>
-                  <span>R$ 146,08</span>
-                </td>
-                <td>
-                  <div>
-                    <button type="button" onClick={() => {}}>
-                      <FiMinusCircle size={20} color="#33BFCB" />
-                    </button>
-                    <input type="number" readOnly value="1" />
-                    <button type="button" onClick={() => {}}>
-                      <FiPlusCircle size={20} color="#33BFCB" />
-                    </button>
-                  </div>
-                </td>
-                <td>
-                  <strong>R$ 1000,00</strong>
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    onClick={() => {}}
-                  >
-                    <FiXCircle size={20} color="#33BFCB" />
-                  </button>
-                </td>
-              </tr>
-          </tbody>
-        </table>
-  
-        <footer>
-          <button type="button">Encomendar</button>
-  
-          <div className="total">
-            <span>Total</span>
-            <strong>R$ 1000,00</strong>
-          </div>
-        </footer>
-      </div>
-    </main>
-  );
+ 
+export default function Cart() {
+ const cart = useSelector(state => {   
+   return state.cart.map(book => ({
+     ...book,
+     subtotal: book.price * book.amount,
+   }))
+ });
+   
+ 
+ const total = useSelector(state =>
+   state.cart.reduce((totalSum, product) => {
+     return totalSum + product.price * product.amount;
+   }, 0)
+ );
+ 
+ const dispatch = useDispatch();
+ 
+ function increment(book) {
+   dispatch(CartActions.updateAmount({
+     id: book.id,
+     amount: book.amount + 1,
+   }));
+ }
+ 
+ function decrement(book) {
+   dispatch(CartActions.updateAmount({
+     id: book.id,
+     amount: book.amount - 1,
+   }));
+ }
+ 
+ return (
+   <main className="container">
+     <div className="bag-container">
+       <table className="book-table">
+         <thead>
+           <tr>
+             <th />
+             <th>Livro</th>
+             <th>Quantidade</th>
+             <th>Subtotal</th>
+             <th />
+           </tr>
+         </thead>
+         <tbody>
+           {cart.map(book => (
+             <tr key={book.id}>
+               <td>
+                 <img src={book.image} alt={book.title} />
+               </td>
+               <td>
+                 <strong>{book.title}</strong>
+                 <span>R$ {book.price}</span>
+               </td>
+               <td>
+                 <div>
+                   <button type="button" onClick={() => decrement(book)}>
+                     <FiMinusCircle size={20} color="#33BFCB" />
+                   </button>
+                   <input type="number" readOnly value={book.amount} />
+                   <button type="button" onClick={() => increment(book)}>
+                     <FiPlusCircle size={20} color="#33BFCB" />
+                   </button>
+                 </div>
+               </td>
+               <td>
+                 <strong>R$ {book.subtotal.toFixed(3).slice(0,-1)}</strong>
+               </td>
+               <td>
+                 <button
+                   type="button"
+                   onClick={() => dispatch(CartActions.removeFromCart(book.id))}
+                 >
+                   <FiXCircle size={20} color="#33BFCB" />
+                 </button>
+               </td>
+             </tr>
+           ))}
+         </tbody>
+       </table>
+ 
+       <footer>
+         <button type="button">Encomendar</button>
+ 
+         <div className="total">
+           <span>Total</span>
+           <strong>R$ {total.toFixed(3).slice(0,-1)}</strong>
+         </div>
+       </footer>
+     </div>
+   </main>
+ );
 }
-
-export default Cart;

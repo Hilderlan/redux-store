@@ -1,10 +1,13 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FiShoppingBag } from 'react-icons/fi';
 import logo from '../../assets/book.png';
 import './styles.css';
 
 const Header = () => {
+  const cartSize = useSelector(state => state.cart.length)
+
   return(
     <header className="header">
       <Link to="/" className="logo">
@@ -16,7 +19,7 @@ const Header = () => {
         <div>
           <strong>Sacola</strong>
           <span>
-            <strong>4</strong> livros
+            <strong> { cartSize } </strong> livros
           </span>
         </div>
         <FiShoppingBag size={ 36 } color="#FFF" />
